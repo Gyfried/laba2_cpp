@@ -13,8 +13,13 @@ PriceList::PriceList(const PriceList& other)
     : items(new PRICE[other.capacity]),
       count(other.count),
       capacity(other.capacity) {
-    for (int i = 0; i < count; ++i) {
-        items[i] = other.items[i];
+    try {
+        for (int i = 0; i < count; ++i) {
+            items[i] = other.items[i];
+        }
+    } catch (...) {
+        delete[] items;
+        throw;
     }
     std::cout << "PriceList: конструктор копирования\n";
 }
@@ -65,7 +70,6 @@ void PriceList::resize(int newCapacity) {
 }
 
 void PriceList::sortByName() {
-    // Сортировка вставками по названию товара.
     for (int i = 1; i < count; ++i) {
         PRICE key(items[i]);
         int j = i - 1;
@@ -90,20 +94,12 @@ const PRICE& PriceList::getAt(int position) const {
     return items[position - 1];
 }
 
-void PriceList::add(const PRICE& item, int position) {
-    if (position < 1 || position > count + 1) {
-        throw std::out_of_range("Позиция добавления должна быть от 1 до количества товаров + 1.");
-    }
-
+void PriceList::add(const PRICE& item) {
     if (count == capacity) {
         resize(capacity * 2);
     }
 
-    for (int i = count; i >= position; --i) {
-        items[i] = items[i - 1];
-    }
-
-    items[position - 1] = item;
+    items[count] = item;
     ++count;
     sortByName();
 }

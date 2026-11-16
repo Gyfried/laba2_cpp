@@ -21,7 +21,7 @@ public:
 
     int getCount() const;
     const PRICE& getAt(int position) const;
-    void add(const PRICE& item, int position);
+    void add(const PRICE& item);
     void remove(int position);
     void edit(int position, const PRICE& item);
     void showAll() const;

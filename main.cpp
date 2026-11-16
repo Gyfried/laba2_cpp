@@ -1,5 +1,6 @@
 #include "Price.h"
 #include "PriceList.h"
+#include "TextProcessor.h"
 
 #include <iostream>
 #include <limits>
@@ -7,8 +8,10 @@
 
 int readInt(const char* prompt) {
     int value;
+
     while (true) {
         std::cout << prompt;
+
         if (std::cin >> value) {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             return value;
@@ -26,19 +29,19 @@ int readInt(const char* prompt) {
 
 void addProduct(PriceList& list) {
     PRICE item;
+
     std::cout << "\nВведите данные нового товара:\n"
               << "Название товара:\n"
               << "Название магазина:\n"
               << "Стоимость в рублях:\n";
+
     std::cin >> item;
+
     if (!std::cin) {
         throw std::runtime_error("Не удалось прочитать данные товара.");
     }
 
-    int position = readInt("Введите позицию добавления (от 1 до ");
-    std::cout << list.getCount() + 1 << "): ";
-    // Повторно получаем позицию, если она некорректна, исключение объяснит причину.
-    list.add(item, position);
+    list.add(item);
     std::cout << "Товар добавлен. Список автоматически отсортирован по алфавиту.\n";
 }
 
@@ -56,7 +59,9 @@ void editProduct(PriceList& list) {
               << "Название товара:\n"
               << "Название магазина:\n"
               << "Стоимость в рублях:\n";
+
     std::cin >> edited;
+
     if (!std::cin) {
         throw std::runtime_error("Не удалось прочитать новые данные товара.");
     }
@@ -85,19 +90,35 @@ void searchProduct(const PriceList& list) {
     }
 }
 
+void processTextFile() {
+    char fileName[1024];
+
+    std::cout << "Введите имя или путь к текстовому файлу: ";
+    std::cin.getline(fileName, sizeof(fileName));
+
+    if (!std::cin) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        throw std::runtime_error("Слишком длинное имя файла.");
+    }
+
+    TextProcessor::printSentencesInReverse(fileName);
+}
+
 int main() {
     try {
         PriceList products;
         bool running = true;
 
         while (running) {
-            std::cout << "\n========== МЕНЮ УПРАВЛЕНИЯ ТОВАРАМИ ==========\n"
+            std::cout << "\n========== МЕНЮ УПРАВЛЕНИЯ ==========\n"
                       << "1. Добавить товар\n"
                       << "2. Показать все товары\n"
                       << "3. Удалить товар\n"
                       << "4. Редактировать товар\n"
                       << "5. Найти товар по названию\n"
                       << "6. Показать количество товаров\n"
+                      << "7. Вывести предложения из файла в обратном порядке\n"
                       << "0. Выход\n";
 
             int choice = readInt("Выберите действие: ");
@@ -125,6 +146,9 @@ int main() {
                     break;
                 case 6:
                     std::cout << "Количество товаров: " << products.getCount() << '\n';
+                    break;
+                case 7:
+                    processTextFile();
                     break;
                 case 0:
                     running = false;
